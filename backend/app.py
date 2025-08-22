@@ -40,16 +40,26 @@ class QueryRequest(BaseModel):
     query: str
     session_id: Optional[str] = None
 
+class SourceWithLink(BaseModel):
+    """Source with optional link"""
+    name: str
+    link: Optional[str] = None
+
 class QueryResponse(BaseModel):
     """Response model for course queries"""
     answer: str
-    sources: List[str]
+    sources: List[SourceWithLink]
     session_id: str
 
 class CourseStats(BaseModel):
     """Response model for course statistics"""
     total_courses: int
     course_titles: List[str]
+
+class SessionClearResponse(BaseModel):
+    """Response model for session clearing"""
+    success: bool
+    message: str
 
 # API Endpoints
 
@@ -65,9 +75,21 @@ async def query_documents(request: QueryRequest):
         # Process query using RAG system
         answer, sources = rag_system.query(request.query, session_id)
         
+        # Convert sources to SourceWithLink format
+        formatted_sources = []
+        for source in sources:
+            if isinstance(source, dict):
+                formatted_sources.append(SourceWithLink(
+                    name=source.get('name', ''),
+                    link=source.get('link')
+                ))
+            else:
+                # Backwards compatibility with string sources
+                formatted_sources.append(SourceWithLink(name=str(source)))
+        
         return QueryResponse(
             answer=answer,
-            sources=sources,
+            sources=formatted_sources,
             session_id=session_id
         )
     except Exception as e:
@@ -81,6 +103,18 @@ async def get_course_stats():
         return CourseStats(
             total_courses=analytics["total_courses"],
             course_titles=analytics["course_titles"]
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/sessions/{session_id}/clear", response_model=SessionClearResponse)
+async def clear_session(session_id: str):
+    """Clear all messages from a specific session"""
+    try:
+        rag_system.session_manager.clear_session(session_id)
+        return SessionClearResponse(
+            success=True,
+            message=f"Session {session_id} cleared successfully"
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

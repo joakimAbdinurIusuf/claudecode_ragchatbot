@@ -5,7 +5,7 @@ const API_URL = '/api';
 let currentSessionId = null;
 
 // DOM elements
-let chatMessages, chatInput, sendButton, totalCourses, courseTitles;
+let chatMessages, chatInput, sendButton, totalCourses, courseTitles, newChatButton;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     sendButton = document.getElementById('sendButton');
     totalCourses = document.getElementById('totalCourses');
     courseTitles = document.getElementById('courseTitles');
+    newChatButton = document.getElementById('newChatButton');
     
     setupEventListeners();
     createNewSession();
@@ -28,6 +29,9 @@ function setupEventListeners() {
     chatInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') sendMessage();
     });
+    
+    // New Chat functionality
+    newChatButton.addEventListener('click', clearCurrentChat);
     
     
     // Suggested questions
@@ -122,10 +126,26 @@ function addMessage(content, type, sources = null, isWelcome = false) {
     let html = `<div class="message-content">${displayContent}</div>`;
     
     if (sources && sources.length > 0) {
+        // Format sources with links
+        const sourceElements = sources.map(source => {
+            if (typeof source === 'object' && source.name) {
+                if (source.link) {
+                    return `<a href="${source.link}" target="_blank" class="source-link">${source.name}</a>`;
+                } else {
+                    return `<span class="source-text">${source.name}</span>`;
+                }
+            } else {
+                // Backwards compatibility with string sources
+                return `<span class="source-text">${source}</span>`;
+            }
+        });
+        
         html += `
             <details class="sources-collapsible">
                 <summary class="sources-header">Sources</summary>
-                <div class="sources-content">${sources.join(', ')}</div>
+                <div class="sources-content">
+                    ${sourceElements.map(source => `<div class="source-item">${source}</div>`).join('')}
+                </div>
             </details>
         `;
     }
@@ -150,6 +170,35 @@ async function createNewSession() {
     currentSessionId = null;
     chatMessages.innerHTML = '';
     addMessage('Welcome to the Course Materials Assistant! I can help you with questions about courses, lessons and specific content. What would you like to know?', 'assistant', null, true);
+}
+
+async function clearCurrentChat() {
+    try {
+        // Clear session on backend if we have a session ID
+        if (currentSessionId) {
+            const response = await fetch(`${API_URL}/sessions/${currentSessionId}/clear`, {
+                method: 'DELETE'
+            });
+            
+            if (!response.ok) {
+                console.warn('Failed to clear session on backend, continuing with frontend clear');
+            }
+        }
+        
+        // Reset frontend state
+        currentSessionId = null;
+        chatMessages.innerHTML = '';
+        
+        // Show welcome message
+        addMessage('Welcome to the Course Materials Assistant! I can help you with questions about courses, lessons and specific content. What would you like to know?', 'assistant', null, true);
+        
+    } catch (error) {
+        console.error('Error clearing chat:', error);
+        // Still clear frontend even if backend fails
+        currentSessionId = null;
+        chatMessages.innerHTML = '';
+        addMessage('Welcome to the Course Materials Assistant! I can help you with questions about courses, lessons and specific content. What would you like to know?', 'assistant', null, true);
+    }
 }
 
 // Load course statistics
