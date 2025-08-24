@@ -34,6 +34,7 @@ body {
     overflow: hidden;
     margin: 0;
     padding: 0;
+    font-size: 18px;
 }
 
 /* Container - Full Screen */
@@ -192,6 +193,7 @@ header h1 {
     border-radius: 18px;
     word-wrap: break-word;
     line-height: 1.5;
+    font-size: 1.1rem;
 }
 
 .message.user .message-content {
@@ -378,7 +380,7 @@ header h1 {
     border: 1px solid var(--border-color);
     border-radius: 24px;
     color: var(--text-primary);
-    font-size: 0.95rem;
+    font-size: 1.1rem;
     transition: all 0.2s ease;
 }
 
@@ -481,7 +483,7 @@ header h1 {
 
 /* New Chat Button */
 .new-chat-button {
-    font-size: 0.875rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--text-secondary);
     cursor: pointer;
@@ -512,7 +514,7 @@ header h1 {
 /* Sidebar Headers */
 .stats-header,
 .suggested-header {
-    font-size: 0.875rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--text-secondary);
     cursor: pointer;
@@ -580,7 +582,7 @@ details[open] .suggested-header::before {
 
 .stat-value {
     display: inline-block;
-    font-size: 0.875rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: var(--primary-color);
     margin-left: 0.5rem;
@@ -588,7 +590,7 @@ details[open] .suggested-header::before {
 
 .stat-label {
     display: inline-block;
-    font-size: 0.875rem;
+    font-size: 1.1rem;
     color: var(--text-secondary);
     font-weight: 600;
 }
@@ -642,7 +644,7 @@ details[open] .suggested-header::before {
 }
 
 .course-title-item {
-    font-size: 0.85rem;
+    font-size: 1.05rem;
     color: var(--text-primary);
     padding: 0.5rem 0.25rem;
     border-bottom: 1px solid var(--border-color);
@@ -679,7 +681,7 @@ details[open] .suggested-header::before {
     border: 1px solid var(--border-color);
     border-radius: 8px;
     color: var(--text-primary);
-    font-size: 0.875rem;
+    font-size: 1rem;
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: left;

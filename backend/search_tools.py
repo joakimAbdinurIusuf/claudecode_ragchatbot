@@ -128,6 +128,7 @@ class CourseOutlineTool(Tool):
     
     def __init__(self, vector_store: VectorStore):
         self.store = vector_store
+        self.last_sources = []  # Track sources from last outline request
     
     def get_tool_definition(self) -> Dict[str, Any]:
         """Return Anthropic tool definition for this tool"""
@@ -175,7 +176,16 @@ class CourseOutlineTool(Tool):
             return f"Course metadata not found for '{course_title}'"
         
         # Format the course outline
-        return self._format_course_outline(target_course)
+        outline_result = self._format_course_outline(target_course)
+        
+        # Track the course as a source
+        course_link = target_course.get('course_link', '')
+        self.last_sources = [{
+            'name': f"{course_title} - Course Outline",
+            'link': course_link
+        }]
+        
+        return outline_result
     
     def _format_course_outline(self, course_metadata: Dict[str, Any]) -> str:
         """Format course metadata into a readable outline"""

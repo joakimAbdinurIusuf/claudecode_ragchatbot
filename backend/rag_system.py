@@ -112,34 +112,51 @@ class RAGSystem:
         Returns:
             Tuple of (response, sources list - empty for tool-based approach)
         """
-        # Create prompt for the AI with clear instructions
-        prompt = f"""Answer this question about course materials: {query}"""
-        
-        # Get conversation history if session exists
-        history = None
-        if session_id:
-            history = self.session_manager.get_conversation_history(session_id)
-        
-        # Generate response using AI with tools
-        response = self.ai_generator.generate_response(
-            query=prompt,
-            conversation_history=history,
-            tools=self.tool_manager.get_tool_definitions(),
-            tool_manager=self.tool_manager
-        )
-        
-        # Get sources from the search tool
-        sources = self.tool_manager.get_last_sources()
+        try:
+            # Create prompt for the AI with clear instructions
+            prompt = f"""Answer this question about course materials: {query}"""
+            
+            # Get conversation history if session exists
+            history = None
+            if session_id:
+                history = self.session_manager.get_conversation_history(session_id)
+            
+            # Generate response using AI with tools
+            response = self.ai_generator.generate_response(
+                query=prompt,
+                conversation_history=history,
+                tools=self.tool_manager.get_tool_definitions(),
+                tool_manager=self.tool_manager
+            )
+            
+            # Get sources from the search tool
+            sources = self.tool_manager.get_last_sources()
 
-        # Reset sources after retrieving them
-        self.tool_manager.reset_sources()
-        
-        # Update conversation history
-        if session_id:
-            self.session_manager.add_exchange(session_id, query, response)
-        
-        # Return response with sources from tool searches
-        return response, sources
+            # Reset sources after retrieving them
+            self.tool_manager.reset_sources()
+            
+            # Update conversation history
+            if session_id:
+                self.session_manager.add_exchange(session_id, query, response)
+            
+            # Log successful query for debugging
+            print(f"[RAG] Query processed successfully: '{query[:50]}...' -> {len(sources)} sources")
+            
+            # Return response with sources from tool searches
+            return response, sources
+            
+        except Exception as e:
+            error_msg = f"I apologize, but I encountered an error processing your query: {str(e)}"
+            print(f"[RAG] Error processing query '{query[:50]}...': {e}")
+            
+            # Try to update conversation history even with error
+            if session_id:
+                try:
+                    self.session_manager.add_exchange(session_id, query, error_msg)
+                except:
+                    pass
+            
+            return error_msg, []
     
     def get_course_analytics(self) -> Dict:
         """Get analytics about the course catalog"""
