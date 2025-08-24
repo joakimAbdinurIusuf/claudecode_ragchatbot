@@ -1,21 +1,23 @@
 """Test the improvements made to the RAG system"""
-import sys
+
 import os
+import sys
 
 # Add parent directory to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from rag_system import RAGSystem
 from config import config
+from rag_system import RAGSystem
+
 
 def test_improved_system():
     """Test the improved RAG system"""
     print("=" * 60)
     print("TESTING IMPROVED RAG SYSTEM")
     print("=" * 60)
-    
+
     rag = RAGSystem(config)
-    
+
     # Test 1: Query that should now use search more often
     print("\n1. Testing machine learning query (should now use search)...")
     response, sources = rag.query("What is machine learning?")
@@ -27,7 +29,7 @@ def test_improved_system():
             print(f"     - {source.get('name', str(source))}")
     else:
         print("   ⚠️  Still using general knowledge")
-    
+
     # Test 2: Course outline query (should now provide sources)
     print("\n2. Testing course outline query (should now provide sources)...")
     response, sources = rag.query("Tell me about the MCP course structure")
@@ -39,7 +41,7 @@ def test_improved_system():
             print(f"     - {source.get('name', str(source))}")
     else:
         print("   ⚠️  Outline sources still not working")
-    
+
     # Test 3: Error handling
     print("\n3. Testing error handling with malformed query...")
     try:
@@ -48,6 +50,7 @@ def test_improved_system():
         print("   ✓ Error handled gracefully")
     except Exception as e:
         print(f"   ❌ Error not handled: {e}")
+
 
 if __name__ == "__main__":
     test_improved_system()

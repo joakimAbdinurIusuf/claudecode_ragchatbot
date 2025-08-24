@@ -23,6 +23,22 @@ uv run uvicorn app:app --reload --port 8000
 
 **Important:** Always use `uv` commands instead of `pip` directly. This project uses uv as the package manager.
 
+## Code Quality Tools
+
+**Development Scripts:**
+```bash
+./scripts/format_code.sh        # Auto-format with black + ruff --fix
+./scripts/quality_check.sh      # Run all quality checks
+./scripts/pre_commit_check.sh   # Full pre-commit pipeline
+```
+
+**Individual Tools:**
+```bash
+uv run black .                  # Format code
+uv run ruff check .            # Lint code  
+uv run mypy backend/ main.py   # Type check
+```
+
 ## Package Management
 
 **Use `uv` for all dependency operations:**
